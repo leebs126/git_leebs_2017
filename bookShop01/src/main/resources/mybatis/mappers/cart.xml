@@ -107,4 +107,24 @@
         							#{goods_id},
         							#{member_id})
 	</insert>
+	
+	<resultMap type="com.bookshop01.cart.vo.CartBean" id="cartResult1">
+	  <result property="goods_id"  column="goods_id" javaType="string"/>
+	</resultMap>
+	
+	<!-- <parameterMap type="hashMap" id="paramMap">
+	  <parameter  property="arr_goods_id" mode="IN" jdbcType="VARCHAR" javaType="java.util.ArrayList" />
+	  <parameter  property="result" mode="OUT" jdbcType="CURSOR" resultMap="cartResult1" />
+	</parameterMap> -->
+	
+    <!-- <select id="proc_addCartFromCookie"  statementType="CALLABLE" parameterMap="paramMap"> 
+             { call bookshop_cart.proc_addCartFromCookie(?,?)} 
+     </select> -->
+     <select id="proc_addCartFromCookie"  statementType="CALLABLE" parameterType="hashmap"> 
+             { call bookshop_cart.proc_addCartFromCookie(
+             #{arr_gods_id,mode=IN,jdbcType=VARCHAR,javaType=java.util.ArrayList,typeHandler=com.bookshop01.common.mybatis.OracleCallBackHandler},
+             #{result,mode=OUT,jdbcType=CURSOR,javaType=java.sql.ResultSet,resultMap=cartResult1}
+             )
+             } 
+     </select>
 </mapper>
