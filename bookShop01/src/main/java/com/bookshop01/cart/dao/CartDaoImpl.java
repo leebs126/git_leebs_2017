@@ -72,14 +72,14 @@ public class CartDaoImpl  implements  CartDao{
 			int cart_id=getMaxCartId();
 			CartBean cartBean=(CartBean)cart_list_cookie.get(i);
 			cartBean.setCart_id(cart_id);
-			//sqlSession.insert("mapper.cart.addCartFromCookie",cartBean);
+			sqlSession.insert("mapper.cart.addCartFromCookie",cartBean);
 		}
 		
 		//String[] arr_goods_id=(String[])cart_list_cookie.toArray();
-		String[] arr_goods_id={"343","344"};
+	/*	String[] arr_goods_id={"343","344"};
 		HashMap paramMap=new HashMap();
 		paramMap.put("arr_goods_id", arr_goods_id);
-		sqlSession.insert("mapper.cart.proc_addCartFromCookie",paramMap);
+		sqlSession.insert("mapper.cart.proc_addCartFromCookie",paramMap);*/
 	}
 
 }

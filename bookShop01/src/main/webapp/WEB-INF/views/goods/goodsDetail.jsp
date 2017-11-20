@@ -87,9 +87,9 @@
 		cookie = document.cookie.split(";");  //쿠키를 ;로 분리한다.
 		for(var i=0; i<cookie.length;i++){
 			element=cookie[i].split("=");
-			alert('element[0]='+element[0]);
+			//alert('element[0]='+element[0]);
 			if(element[0]=='cart'){
-			  alert("goods_id="+element[1]);
+			//  alert("goods_id="+element[1]);
 			  str_cookie=element[1];
 			}
 		}
