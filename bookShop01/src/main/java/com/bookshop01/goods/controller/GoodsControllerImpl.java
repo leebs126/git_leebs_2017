@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -30,10 +31,38 @@ public class GoodsControllerImpl  extends BaseController implements GoodsControl
 	
 	@RequestMapping(value="/goodsDetail.do" ,method = RequestMethod.GET)
 	public ModelAndView goodsDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//추천도서목록이 저장된 쿠키를 가지고온다.
+		String reco_value=null;
+		HashMap detailMap=new HashMap();
+		ArrayList my_reco_list=new ArrayList();
+		Cookie[] allValues=request.getCookies();
+		for(int i=0;i<allValues.length;i++){
+			//System.out.println(allValues[i].getName());
+			if(allValues[i].getName().equals("recoGoodsId")){
+				System.out.println(allValues[i].getValue());
+				reco_value=allValues[i].getValue();
+				break;
+			}
+		}
+		
+		//상품 번호를 분리한 후 상품번호를 arraylist에 저장한다.
+		if(reco_value==null || reco_value.length()==0){
+			//cartHash.put("my_reco_list",null);
+		}else{
+			String[] goods_ids=reco_value.split("-");
+			my_reco_list=new ArrayList();
+			for(int i=0;i<goods_ids.length;i++){
+				my_reco_list.add(goods_ids[i]);
+			}
+		}
+		
 		String goods_id = request.getParameter("goods_id");
 		String fileName=getFileName(request);
 		HttpSession session=request.getSession();
-		HashMap goodsMap=goodsService.goodsDetail(goods_id);
+		detailMap.put("my_reco_list", my_reco_list);
+		detailMap.put("goods_id",goods_id);
+		HashMap goodsMap=goodsService.goodsDetail(detailMap);
+		//HashMap goodsMap=goodsService.goodsDetail(goods_id);
 		ModelAndView mav = new ModelAndView(fileName);
 		mav.addObject("goodsMap", goodsMap);
 		GoodsBean goodsBean=(GoodsBean)goodsMap.get("goods");

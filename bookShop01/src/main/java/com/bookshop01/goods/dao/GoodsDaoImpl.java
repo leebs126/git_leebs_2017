@@ -52,4 +52,22 @@ public class GoodsDaoImpl  implements GoodsDao{
 		ArrayList list=(ArrayList)sqlSession.selectList("mapper.goods.searchGoods_map",searchMap);
 		return list;
 	}
+	public ArrayList recoGoodsList(String goods_id) throws Exception{
+		ArrayList reco_goods_list=(ArrayList)sqlSession.selectList("mapper.goods.recoGoodsList",goods_id);
+		return reco_goods_list;
+	}
+	public ArrayList recoGoodsPoint(String goods_id) throws Exception{
+		ArrayList reco_goods_point=(ArrayList)sqlSession.selectList("mapper.goods.recoGoodsPoint",goods_id);
+		return reco_goods_point;
+	}
+	public ArrayList myRecoList(ArrayList my_reco_list) throws Exception{
+		String goods_id=null;
+		ArrayList reco_goods_list=new ArrayList();
+		for(int i=0;i<my_reco_list.size();i++){
+			goods_id=(String)my_reco_list.get(i);
+			GoodsBean goodsBean =(GoodsBean)sqlSession.selectOne("mapper.goods.myRecoList",goods_id);
+			reco_goods_list.add(goodsBean);
+		}
+		return reco_goods_list;
+	}
 }

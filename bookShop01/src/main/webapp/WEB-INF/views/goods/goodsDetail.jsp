@@ -9,11 +9,20 @@
       pageContext.setAttribute("crcn", "\r\n"); //Space, Enter
       pageContext.setAttribute("br", "<br/>"); //br 태그
 %> 
+
 <html>
 <head>
 <style>
 #layer {
-	z-index: 2;
+	z-index:2;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+}
+
+#layer_reco{
+	z-index:2;
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -32,10 +41,59 @@
 	border: 3px solid #87cb42;
 }
 
+#popup_reco {
+	z-index: 3;
+	position: fixed;
+	text-align: center;
+	left: 50%;
+	top: 45%;
+	width: 300px;
+	height: 200px;
+	background-color: #ccffff;
+	border: 3px solid #87cb42;
+}
+
+#d_reco_list {
+	z-index: 3;
+	position: absolute;
+	text-align: center;
+	left: 10%;
+	top: 50%;
+	width:70%;
+	background-color: #ccffff;
+	border: 1px solid #87cb42;
+}
+
+
 #close {
 	z-index: 4;
 	float: right;
 }
+  
+ .div1{
+   position:relative;    
+   float:left;
+   margin-left:10px;
+   width:170px;
+   height:200px;
+   margin-bottom:50px;
+   /* border:1px solid black;  */
+ }
+ 
+ .clr{
+   clear:left;
+ }
+
+.d_eval_point {
+	z-index:2;
+	position: absolute;
+	top: -80px;
+	left: 0px;
+	width: 100%;
+	border:1px solid black;
+	background-color: #ccffff;
+}
+
 </style>
 <script type="text/javascript">
 	function add_cart(goods_id,isLogOn) {
@@ -86,11 +144,21 @@
 		//if(document.cookie !=""){
 		cookie = document.cookie.split(";");  //쿠키를 ;로 분리한다.
 		for(var i=0; i<cookie.length;i++){
+			alert(cookie);
 			element=cookie[i].split("=");
 			//alert('element[0]='+element[0]);
 			if(element[0]=='cart'){
 			//  alert("goods_id="+element[1]);
 			  str_cookie=element[1];
+			}
+		}
+		
+		//쿠키에 상품번호가 존재하는지 체크한다.
+		var goods_ids=str_cookie.split("-");
+		for(var i=0;i<goods_ids.length;i++){
+			if(goods_id==goods_ids[i]){
+				alert("이미 등록된 상품입니다.");
+				return;
 			}
 		}
 		
@@ -101,8 +169,8 @@
 			str_cookie+="-"+goods_id;
 		} 
 		//str_cookie+="-"+goods_id;
-		document.cookie ="cart=" +str_cookie+";path=/;expires=100";
-	//}
+		document.cookie ="cart="+str_cookie+";path=/;expires=100";
+		imagePopup('open', '.layer01');
 		
 //		document.cookie ="cart=" +goods_id + ";path=/; expires=" + expireDate.toGMTString();
 		/* 
@@ -115,29 +183,22 @@
 	  // document.cookie ="cart="+str_cookie +";path=/;expires=100";
 	   //document.cookie ="cart=" +str_cookie ; 
 	 }
-	
-		
-		
-		
-		
-	
-	
 
-	function imagePopup(type) {
-		if (type == 'open') {
-			// 팝업창을 연다.
-			jQuery('#layer').attr('style', 'visibility:visible');
+function imagePopup(type) {
+	if (type == 'open') {
+		// 팝업창을 연다.
+		jQuery('#layer').attr('style', 'visibility:visible');
 
-			// 페이지를 가리기위한 레이어 영역의 높이를 페이지 전체의 높이와 같게 한다.
-			jQuery('#layer').height(jQuery(document).height());
-		}
-
-		else if (type == 'close') {
-
-			// 팝업창을 닫는다.
-			jQuery('#layer').attr('style', 'visibility:hidden');
-		}
+		// 페이지를 가리기위한 레이어 영역의 높이를 페이지 전체의 높이와 같게 한다.
+		jQuery('#layer').height(jQuery(document).height());
 	}
+
+	else if (type == 'close') {
+
+		// 팝업창을 닫는다.
+		jQuery('#layer').attr('style', 'visibility:hidden');
+	}
+}
 	
 function fn_order_each_goods(goods_id,goods_title,goods_sales_price,fileName){
 	
@@ -186,6 +247,91 @@ function fn_order_each_goods(goods_id,goods_title,goods_sales_price,fileName){
 	    formObj.action="/bookshop01/order/orderEachGoods.do";
 	    formObj.submit();
 	}	
+
+var isLoadingFirst=true;  //브라우저에 화면이 최초로 로딩했느냐 여부 저장변수 
+function fn_balloon_on(reco_num){
+	//alert(reco_num);
+	var d_eval_point;
+	if(isLoadingFirst=true){
+		d_eval_point=document.getElementById("d_eval_point1");
+		d_eval_point.style.display="none";
+		isLoadingFirst=false;
+	}
+	
+	d_eval_point=document.getElementById("d_eval_point"+reco_num);
+	d_eval_point.style.display="block";
+}
+
+function fn_balloon_off(reco_num){
+	var d_eval_point;
+	d_eval_point=document.getElementById("d_eval_point"+reco_num);
+	d_eval_point.style.display="none";
+}
+
+
+function fn_add_reco_list(goods_id){
+	//alert(goods_id);
+	var reco_value="";
+	cookie = document.cookie.split(";");  //쿠키를 ;로 분리한다.
+	for(var i=0; i<cookie.length;i++){
+		element=cookie[i].split("=");
+		//alert('element[0]='+element[0]);
+		if(element[0].trim()=='recoGoodsId'){  //' recoGoodsId'
+		  //alert("goods_id="+element[1]);
+		  reco_value=element[1];
+		  break;
+		}
+	}
+	//alert(reco_value);
+	
+	//쿠키에 상품번호가 존재하는지 체크한다.
+	var goods_ids=reco_value.split("-");
+	for(var i=0;i<goods_ids.length;i++){
+		if(goods_id==goods_ids[i]){
+			alert("이미 등록된 상품입니다.");
+			return;
+		}
+	}
+	
+	//기존 쿠키의 값을 가지고 와서 함수로 전달된 상품번호를 '-'으로 연결한 후 다시 쿠키에 저장한다.
+	if(reco_value==''){
+		reco_value+=goods_id;	
+	}else{
+		reco_value+="-"+goods_id;
+	} 
+	//str_cookie+="-"+goods_id;
+	document.cookie ="recoGoodsId=" +reco_value+";path=/;expires=100;";
+	recoPopup('open');
+	//recoPopup('open', '.layer01');
+	//recoPopup('open' );
+  
+}
+
+function recoPopup(type) {
+	if (type == 'open') {
+		// 팝업창을 연다.
+		jQuery('#layer_reco').attr('style', 'visibility:visible');
+
+		// 페이지를 가리기위한 레이어 영역의 높이를 페이지 전체의 높이와 같게 한다.
+		jQuery('#layer_reco').height(jQuery(document).height());
+	}
+
+	else if (type == 'close') {
+
+		// 팝업창을 닫는다.
+		jQuery('#layer_reco').attr('style', 'visibility:hidden');
+	}
+}
+
+function fn_reco_list_on(type){
+   	
+	var d_reco_list=document.getElementById("d_reco_list");
+	if(type=='open'){
+	  d_reco_list.style.display="block";
+	}else if(type='close'){
+	  d_reco_list.style.display="none";	
+	}
+}
 </script>
 </head>
 <body>
@@ -269,8 +415,7 @@ function fn_order_each_goods(goods_id,goods_title,goods_sales_price,fileName){
 		<ul>
 			<li><a class="buy" href="javascript:fn_order_each_goods('${goodsMap.goods.goods_id }','${goodsMap.goods.goods_title }','${goodsMap.goods.goods_sales_price}','${goodsMap.goods.goods_fileName}');">구매하기 </a></li>
 			<li><a class="cart" href="javascript:add_cart('${goodsMap.goods.goods_id }',${isLogOn })">장바구니</a></li>
-			
-			<li><a class="wish" href="#">위시리스트</a></li>
+			<li><a class="wish" href="javascript:fn_add_reco_list('${goodsMap.goods.goods_id}')">추천목록추가</a></li>
 		</ul>
 	</div>
 	<div class="clear"></div>
@@ -283,6 +428,7 @@ function fn_order_each_goods(goods_id,goods_title,goods_sales_price,fileName){
 			<li><a href="#tab4">출판사서평</a></li>
 			<li><a href="#tab5">추천사</a></li>
 			<li><a href="#tab6">리뷰</a></li>
+			<li><a href="#tab7">추천도서</a></li>
 		</ul>
 		<div class="tab_container">
 			<div class="tab_content" id="tab1">
@@ -316,7 +462,90 @@ function fn_order_each_goods(goods_id,goods_title,goods_sales_price,fileName){
 				<h4>리뷰</h4>
 						
 			</div>
-		</div>
+			<div class="tab_content" id="tab7">
+				<h4>추천도서</h4>
+		 <%-- <c:forEach  var="i" begin="1" end="10"  step="1"> --%>
+		 <c:forEach  var="goods" items="${goodsMap.recoGoodsList }" varStatus="status">
+		  <div class="div1">
+			  <a href="${pageContext.request.contextPath}/goods/goodsDetail.do?goods_id=${goods.goods_id }">
+			  <img  id="img_reco"  onmouseover="fn_balloon_on('${status.count }')"
+			         onmouseout="fn_balloon_off('${status.count}')"
+			       width="100px" height="100px"
+				src="${pageContext.request.contextPath}/fileDownload.do?goods_id=${goods.goods_id}&fileName=${goods.goods_fileName}" />
+			       <%-- <img  width="100px" height="100px"  
+			        src="${pageContext.request.contextPath}/resources/image/codi04.jpg" /> --%>
+			   </a>  
+			  <li><a href="#">${goods.goods_title }</a></li>
+			<c:choose>
+			  <c:when test="${status.count==1 }">   
+			  <div class="d_eval_point" id="d_eval_point${status.count }"  style="display:block;">
+				  <li  style="color:blue;">판매지수:${goodsMap.recoGoodsPoint[status.count-1].sales_index }</li>
+				  <li  style="color:blue;">사용자리뷰수:${goodsMap.recoGoodsPoint[status.count-1].user_review_point }</li>
+				  <li  style="color:blue;">상품조회수:${goodsMap.recoGoodsPoint[status.count-1].goods_hit_point }</li>
+				  <li  style="color:blue;">전문가평가점수:${goodsMap.recoGoodsPoint[status.count-1].expert_eval_point }</li>
+			  </div>
+			  </c:when>
+			  <c:otherwise>
+			    <div class="d_eval_point" id="d_eval_point${status.count }"  style="display:none;">
+				  <li  style="color:blue;">판매지수:${goodsMap.recoGoodsPoint[status.count-1].sales_index }</li>
+				  <li  style="color:blue;">사용자리뷰수:${goodsMap.recoGoodsPoint[status.count-1].user_review_point }</li>
+				  <li  style="color:blue;">상품조회수:${goodsMap.recoGoodsPoint[status.count-1].goods_hit_point }</li>
+				  <li  style="color:blue;">전문가평가점수:${goodsMap.recoGoodsPoint[status.count-1].expert_eval_point }</li>
+			  </div>
+			  </c:otherwise>
+			</c:choose>  
+		   </div>
+		   <c:if test="${status.count%5==0 }">
+		     <div class="clr" ></div>
+		   </c:if>
+		   <c:if test="${status.last==true }">
+		     <!-- 추천하기 이미지 -->
+			<div class="div1">
+			  <img onClick="fn_reco_list_on('open')" 
+			    src="${pageContext.request.contextPath}/resources/image/plus.jpg" />
+		   </div> 
+		   </c:if>
+		</c:forEach>
+		<!-- 추천도서 팝업창용 div -->
+		 <div  id="d_reco_list"  style="display:none;">
+		   <table border="0" width="100%" align="center">
+		     <tr bgcolor="yellow" align="center">
+		       <td>구분</td>
+		       <td>상품명</td>
+		       <td>판매가</td>
+		     </tr>
+		     <tr>
+		      <td colspan="3">
+		        <hr>
+		      </td>
+		     </tr>
+		<%--  <c:forEach var="i" begin="1" end="5" step="1"> --%>
+		<c:forEach var="recoGoods" items="${goodsMap.my_reco_goods_list }">  
+		     <tr  align="center">
+		        <td><input type="checkbox"  /> </td>
+		        <td>   
+		        <img width="100px" height="100px" 
+		           src="${pageContext.request.contextPath}/fileDownload.do?goods_id=${recoGoods.goods_id}&fileName=${recoGoods.goods_fileName}" />
+		           ${recoGoods.goods_title }
+		        </td>
+		        <td>${recoGoods.goods_price }원  </td>
+		     </tr>
+		     <tr>
+		      <td colspan="3">
+		        <hr>
+		      </td>
+		     </tr>
+		 </c:forEach>
+		   <tr>
+		     <td colspan="3" align="center">
+		        <input type="button" value="추천도서반영하기"  />
+		        <input type="button" value="닫기" onClick="fn_reco_list_on('close')"  />
+		      </td>
+		   </tr>    
+		   </table>
+		 </div>	
+	  </div>
+	</div>
 	</div>
 	<div class="clear"></div>
 	<div id="layer" style="visibility: hidden">
@@ -324,12 +553,51 @@ function fn_order_each_goods(goods_id,goods_title,goods_sales_price,fileName){
 		<div id="popup">
 			<!-- 팝업창 닫기 버튼 -->
 			<a href="javascript:" onClick="javascript:imagePopup('close', '.layer01');"> <img
-				src="${pageContext.request.contextPath}/image/close.png" id="close" />
+				src="${pageContext.request.contextPath}/resources/image/close.png" id="close" />
 			</a> <br /> <font size="12" id="contents">장바구니에 담았습니다.</font><br>
-<form action='${pageContext.request.contextPath}/cart/myCartMain.do'>				
-		<input  name="btn_cart_list" type="submit" value="장바구니 보기">
-			<div></div>
-</form>			
+			
+  <c:choose>
+     <c:when test="${isLogOn==true }">			
+			<form action='${pageContext.request.contextPath}/cart/myCartMain.do'>				
+					<input  name="btn_cart_list" type="submit" value="장바구니 보기">
+						
+			</form>
+    </c:when>	
+    <c:otherwise>
+         <form action='${pageContext.request.contextPath}/cart/myCartMainCookie.do'>				
+					<input  name="btn_cart_list" type="submit" value="장바구니 보기">
+						
+			</form>
+    </c:otherwise>		
+  </c:choose>			
+     </div>
+    </div> 
+  
+  
+<div id="layer_reco" style="visibility: hidden">
+		<!-- visibility:hidden 으로 설정하여 해당 div안의 모든것들을 가려둔다. -->
+		<div id="popup_reco">
+			<!-- 팝업창 닫기 버튼 -->
+			<a href="javascript:" onClick="javascript:recoPopup('close', '.layer01');"> <img
+				src="${pageContext.request.contextPath}/resources/image/close.png" id="close" />
+			</a> <br /> <font size="12" id="contents">추천목록에 담았습니다.</font><br>
+			
+  <c:choose>
+     <c:when test="${isLogOn==true }">			
+			<form action='${pageContext.request.contextPath}/goods/goodsRecoList.do'>				
+					<input  name="btn_reco_list" type="submit" value="추천목록보기">
+						
+			</form>
+    </c:when>	
+    <c:otherwise>
+         <form action='${pageContext.request.contextPath}/goods/goodsRecoList.do'>				
+					<input  name="btn_reco_list" type="submit" value="추천목록 보기">
+						
+			</form>
+    </c:otherwise>		
+  </c:choose>			
+     </div>
+    </div> 
 </body>
 </html>
 <input type="hidden" name="isLogOn" id="isLogOn" value="${isLogOn}"/>
